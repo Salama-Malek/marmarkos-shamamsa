@@ -1,9 +1,15 @@
 import { Tabs } from 'expo-router';
 import { CalendarDays, Users, ListChecks, BarChart3 } from 'lucide-react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '@/theme';
 import { ar } from '@/lib/i18n';
 
 export default function TabsLayout() {
+  // Pad the tab bar by the bottom inset so its labels clear the Android
+  // gesture/3-button system bar and the iOS home indicator. Without this the
+  // labels sit underneath the system UI and look cropped.
+  const insets = useSafeAreaInsets();
+
   return (
     <Tabs
       screenOptions={{
@@ -13,8 +19,8 @@ export default function TabsLayout() {
         tabBarStyle: {
           backgroundColor: colors.surface,
           borderTopColor: colors.border,
-          height: 64,
-          paddingBottom: 8,
+          height: 64 + insets.bottom,
+          paddingBottom: 8 + insets.bottom,
           paddingTop: 6,
         },
         tabBarLabelStyle: {
