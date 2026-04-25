@@ -82,15 +82,16 @@ export function formatArabicDateLong(
   return `${arabicDayName(date)} · ${formatArabicDate(date, numerals)}`;
 }
 
-export function defaultSessionTitle(
+export function defaultLiturgyTitle(
   d: Date | string,
   numerals: NumeralStyle = 'arabic',
 ): string {
   const date = typeof d === 'string' ? fromIsoDate(d) : d;
+  const dayName = arabicDayName(date);
   const day = formatNumber(date.getDate(), numerals);
   const month = arabicMonthName(date.getMonth());
   const year = formatNumber(date.getFullYear(), numerals);
-  return `اجتماع الأحد ${day} ${month} ${year}`;
+  return `قداس ${dayName} ${day} ${month} ${year}`;
 }
 
 export function yearMonthKey(d: Date | string): string {
