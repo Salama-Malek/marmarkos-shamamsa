@@ -1,5 +1,5 @@
 import { getDb } from './client';
-import type { DeaconStats, PartStats } from '@/types';
+import type { DeaconStats } from '@/types';
 import { listDeacons } from './deacons';
 import { listAllParts } from './parts';
 
@@ -169,35 +169,3 @@ export async function getAllDeaconStats(period: PeriodFilter = {}): Promise<Deac
   return result;
 }
 
-export async function getAllPartStats(period: PeriodFilter = {}): Promise<PartStats[]> {
-  const db = await getDb();
-  const parts = await listAllParts();
-  const { clause, params } = buildDateClause('l', period);
-  const dateWhere = clause ? `AND ${clause}` : '';
-
-  const result: PartStats[] = [];
-  for (const part of parts) {
-    const row = await db.getFirstAsync<{
-      total: number;
-      uniq: number;
-      last: string | null;
-    }>(
-      `SELECT
-         COUNT(*) AS total,
-         COUNT(DISTINCT a.deacon_id) AS uniq,
-         MAX(l.date) AS last
-       FROM assignments a
-       JOIN liturgies l ON l.id = a.liturgy_id
-       WHERE a.part_id = ? AND l.status = 'held' ${dateWhere};`,
-      part.id,
-      ...params,
-    );
-    result.push({
-      part,
-      totalAssignments: row?.total ?? 0,
-      uniqueDeacons: row?.uniq ?? 0,
-      lastAssignedDate: row?.last ?? undefined,
-    });
-  }
-  return result;
-}

@@ -86,10 +86,3 @@ export interface DeaconStats {
   lastAttendedDate?: string;
 }
 
-export interface PartStats {
-  part: Part;
-  totalAssignments: number;
-  /** Distinct deacons that have done this part at least once. */
-  uniqueDeacons: number;
-  lastAssignedDate?: string;
-}

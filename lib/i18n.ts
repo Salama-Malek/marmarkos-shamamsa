@@ -170,7 +170,6 @@ export const ar = {
     sections: {
       mostAssigned: 'الأكثر تكليفاً',
       leastAssigned: 'الأقل تكليفاً (محتاجون فرص)',
-      perPart: 'توزيع كل جزء',
       neverAssigned: 'لم يأخذوا أي جزء بعد',
     },
     notRecorded: 'غير مسجَّل',

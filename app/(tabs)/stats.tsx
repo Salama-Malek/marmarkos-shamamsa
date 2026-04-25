@@ -9,11 +9,9 @@ import { Card } from '@/components/ui/Card';
 import { FilterChips } from '@/components/ui/FilterChips';
 import { EmptyState } from '@/components/ui/EmptyState';
 import { DeaconLeaderRow } from '@/components/stats/DeaconLeaderRow';
-import { PartStatsRow } from '@/components/stats/PartStatsRow';
 
 import {
   getAllDeaconStats,
-  getAllPartStats,
   getOverallStats,
   type OverallStats,
 } from '@/db/stats';
@@ -23,7 +21,7 @@ import { buildPeriod, type PeriodKey } from '@/lib/period';
 import { formatNumber, formatPercent } from '@/lib/numerals';
 import { useNumerals } from '@/lib/numeralsContext';
 import { colors, spacing, text } from '@/theme';
-import type { DeaconStats, PartStats } from '@/types';
+import type { DeaconStats } from '@/types';
 
 const PERIOD_OPTIONS = [
   { value: 'all' as const, label: ar.stats.period.all },
@@ -40,20 +38,17 @@ export default function StatsTab() {
   const [periodKey, setPeriodKey] = useState<PeriodKey>('all');
   const [overall, setOverall] = useState<OverallStats | null>(null);
   const [deaconStats, setDeaconStats] = useState<DeaconStats[]>([]);
-  const [partStats, setPartStats] = useState<PartStats[]>([]);
   const [loading, setLoading] = useState(true);
 
   const reload = useCallback(async () => {
     const period = buildPeriod(periodKey);
     const filter = { dateFrom: period.dateFrom, dateTo: period.dateTo };
-    const [o, ds, ps] = await Promise.all([
+    const [o, ds] = await Promise.all([
       getOverallStats(filter),
       getAllDeaconStats(filter),
-      getAllPartStats(filter),
     ]);
     setOverall(o);
     setDeaconStats(ds);
-    setPartStats(ps);
     setLoading(false);
   }, [periodKey]);
 
@@ -68,10 +63,18 @@ export default function StatsTab() {
     [deaconStats],
   );
 
+  // The three sections below are mutually exclusive by deacon to avoid the
+  // confusing case where the same person showed up under both "most" and
+  // "least" assigned (e.g. when their count was 1 and they happened to be
+  // both the top of the leaderboard AND below the opportunity threshold).
+  //   • most assigned     → count ≥ NEEDS_OPPORTUNITY_THRESHOLD
+  //   • needs opportunity → 0 < count < NEEDS_OPPORTUNITY_THRESHOLD
+  //   • never assigned    → count === 0
+
   const mostAssigned = useMemo(
     () =>
       [...activeDeacons]
-        .filter((s) => s.assignmentsCount > 0)
+        .filter((s) => s.assignmentsCount >= NEEDS_OPPORTUNITY_THRESHOLD)
         .sort((a, b) => b.assignmentsCount - a.assignmentsCount)
         .slice(0, 10),
     [activeDeacons],
@@ -88,11 +91,6 @@ export default function StatsTab() {
   const neverAssigned = useMemo(
     () => activeDeacons.filter((s) => s.assignmentsCount === 0),
     [activeDeacons],
-  );
-
-  const partsByUsage = useMemo(
-    () => [...partStats].sort((a, b) => b.totalAssignments - a.totalAssignments),
-    [partStats],
   );
 
   const showEmpty =
@@ -214,20 +212,6 @@ export default function StatsTab() {
                         router.push({ pathname: '/deacon/[id]', params: { id: s.deacon.id } })
                       }
                     />
-                  </View>
-                ))}
-              </Card>
-            </>
-          ) : null}
-
-          {partsByUsage.length > 0 ? (
-            <>
-              <Text style={[text.subheading, styles.section]}>{ar.stats.sections.perPart}</Text>
-              <Card>
-                {partsByUsage.map((p, idx) => (
-                  <View key={p.part.id}>
-                    {idx > 0 ? <View style={styles.divider} /> : null}
-                    <PartStatsRow stats={p} />
                   </View>
                 ))}
               </Card>
