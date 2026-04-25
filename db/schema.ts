@@ -121,8 +121,20 @@ export interface Migration {
   statements: string[];
 }
 
+// v2 wipes the v1 seed (general parts list shrunk to 5 readings + 3 inside-
+// altar roles, and per-feast prophecies/Gospels expanded into one part per
+// reader). User-created (is_seeded=0) rows are preserved. The seed function
+// re-inserts the new canonical list on the next launch because both tables
+// expose at least one is_seeded=0 row only if the user added customs.
+const RESEED_V2 = [
+  // CASCADE deletes feast_parts and assignments referencing seeded rows.
+  `DELETE FROM parts WHERE is_seeded = 1;`,
+  `DELETE FROM feasts WHERE is_seeded = 1;`,
+];
+
 export const MIGRATIONS: Migration[] = [
   { version: 1, statements: SCHEMA_V1 },
+  { version: 2, statements: RESEED_V2 },
 ];
 
 export const DB_NAME = 'marmarkos-shamamsa.db';
