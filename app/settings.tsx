@@ -10,6 +10,7 @@ import {
   Code2,
   Download,
   ExternalLink,
+  FileDown,
   HardDrive,
   Trash2,
   Upload,
@@ -180,6 +181,13 @@ export default function SettingsRoute() {
 
         <SectionTitle title={ar.settings.dataManagement} />
         <Card>
+          <ActionRow
+            icon={<FileDown size={22} color={colors.gold} />}
+            title={ar.export.title}
+            subtitle={ar.export.subtitle}
+            onPress={() => router.push('/export' as never)}
+          />
+          <Divider />
           <ActionRow
             icon={<Download size={22} color={colors.primary} />}
             title={ar.settings.backup}
