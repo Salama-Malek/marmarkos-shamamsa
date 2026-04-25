@@ -73,6 +73,16 @@ export async function updateFeast(id: string, arName: string): Promise<Feast> {
   return updated;
 }
 
+export async function getFeastPartCounts(): Promise<Map<string, number>> {
+  const db = await getDb();
+  const rows = await db.getAllAsync<{ feast_id: string; n: number }>(
+    `SELECT feast_id, COUNT(*) AS n FROM feast_parts GROUP BY feast_id;`,
+  );
+  const map = new Map<string, number>();
+  for (const r of rows) map.set(r.feast_id, r.n);
+  return map;
+}
+
 export async function deleteFeast(id: string): Promise<void> {
   const db = await getDb();
   // Seeded feasts shouldn't be deleted via UI; the DAL still allows it for
