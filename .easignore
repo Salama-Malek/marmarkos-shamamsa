@@ -1,0 +1,9 @@
+# Files excluded from EAS build uploads (in addition to .gitignore patterns).
+node_modules/
+.expo/
+dist/
+web-build/
+.env*
+*.log
+scripts/
+claude-code-prompt.md
