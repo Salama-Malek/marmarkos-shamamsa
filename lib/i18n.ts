@@ -224,5 +224,13 @@ export const ar = {
   validation: {
     required: 'هذا الحقل مطلوب',
     invalidDate: 'تاريخ غير صالح',
+    nameRequired: 'الاسم مطلوب',
+    dateRequired: 'التاريخ مطلوب',
+  },
+
+  common: {
+    optional: 'اختياري',
+    yes: 'نعم',
+    no: 'لا',
   },
 };

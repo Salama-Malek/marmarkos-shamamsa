@@ -79,6 +79,11 @@ export async function getOverallStats(period: PeriodFilter = {}): Promise<Overal
   };
 }
 
+export async function getDeaconStats(deaconId: string, period: PeriodFilter = {}): Promise<DeaconStats | null> {
+  const all = await getAllDeaconStats(period);
+  return all.find((s) => s.deacon.id === deaconId) ?? null;
+}
+
 export async function getAllDeaconStats(period: PeriodFilter = {}): Promise<DeaconStats[]> {
   const db = await getDb();
   const deacons = await listDeacons({ filter: 'all' });
